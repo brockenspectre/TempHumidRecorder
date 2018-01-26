@@ -56,17 +56,19 @@ void setup()
   digitalWrite(gnd, LOW);
 
   portOne.begin(115200);
-  LCD.setBacklight(100);
+  LCD.setBacklight(50);
   LCD.toggleSplash();
   delay(3000);
   LCD.clearScreen();
+
+  Serial.print(" Temp(F)   Humidity(%)");
 }
 //-------------------------------------------------------------------------------------------
 void loop()
 {
   readSensor();
   printOut();
-  delay(1000);
+  delay(60000);
 }
 //-------------------------------------------------------------------------------------------
 void readSensor()
@@ -79,9 +81,8 @@ void readSensor()
 //-------------------------------------------------------------------------------------------
 void printOut()
 {
-  Serial.print(" Temp(F) = ");
   Serial.print(tempF);
-  Serial.print(" Humidity(%) = ");
+  Serial.print(" ");
   Serial.println(humidity); 
   LCD.setHome();
   LCD.clearScreen();
