@@ -26,7 +26,17 @@ https://github.com/sparkfun/SHT15_Breakout/
 This code is beerware.
 Distributed as-is; no warranty is given. 
 ******************************************************************************/
+#include <SPI.h>
+#include <SparkFunDS3234RTC.h>
 
+// Comment out the line below if you want month printed before date.
+// E.g. October 31, 2016: 10/31/16 vs. 31/10/16
+#define PRINT_USA_DATE
+
+//////////////////////////////////
+// Configurable Pin Definitions //
+//////////////////////////////////
+#define DS13074_CS_PIN 10 // DeadOn RTC Chip-select pin
 
 //variables for storing values
 float tempC = 0;
@@ -56,16 +66,24 @@ void setup()
   digitalWrite(gnd, LOW);
 
   portOne.begin(115200);
-  LCD.setBacklight(50);
+  LCD.setBacklight(0);
   LCD.toggleSplash();
   delay(3000);
   LCD.clearScreen();
 
-  Serial.print(" Temp(F)   Humidity(%)");
+ // Call rtc.begin([cs]) to initialize the library
+ // The chip-select pin should be sent as the only parameter
+  rtc.begin(DS13074_CS_PIN);
+
+  Serial.println(" Time Date Temp(F)   Humidity(%)");
 }
 //-------------------------------------------------------------------------------------------
 void loop()
 {
+    // Call rtc.update() to update all rtc.seconds(), rtc.minutes(),
+  // etc. return functions.
+  rtc.update();
+
   readSensor();
   printOut();
   delay(60000);
@@ -81,6 +99,21 @@ void readSensor()
 //-------------------------------------------------------------------------------------------
 void printOut()
 {
+  Serial.print(String(rtc.hour()) + ":"); // Print hour
+  if (rtc.minute() < 10)
+    Serial.print('0'); // Print leading '0' for minute
+  Serial.print(String(rtc.minute()) + ":"); // Print minute
+  if (rtc.second() < 10)
+    Serial.print('0'); // Print leading '0' for second
+  Serial.print(String(rtc.second())); // Print second
+  Serial.print(" ");
+
+  Serial.print(String(rtc.month()) + "/" +   // Print month
+                 String(rtc.date()) + "/");  // Print date
+
+  Serial.print(String(rtc.year()));        // Print year
+  Serial.print(" ");
+  
   Serial.print(tempF);
   Serial.print(" ");
   Serial.println(humidity); 
